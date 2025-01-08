@@ -26,7 +26,7 @@ Controls:
     w,a,s,d - Move position
 */
 
-let n;
+let iterations;
 
 const a = "0";
 const b = "1";
@@ -35,24 +35,12 @@ const d = "3";
 const e = "4";
 const f = "5";
 const g = "6";
-
-let res = 32 /* * 1.25 */
-let max = res
-let xoff = 0
-let yoff = 0
-
-let maxiter = 64
-
-let resfac = 1.25
-let movefac = 0.2
-let zoomfac = 0.2
-
-let mode = "zoom"
-
-let posFac = 0.01
+const h = "7";
+const i = "8";
+const j = "9";
 
 setLegend(
-  [ a, bitmap`
+    [ a, bitmap`
 0000000000000000
 0000000000000000
 0000000000000000
@@ -69,24 +57,41 @@ setLegend(
 0000000000000000
 0000000000000000
 0000000000000000`],
-  [ b, bitmap`
-4444444444444444
-4444444444444444
-4444444444444444
-4444444444444444
-4444444444444444
-4444444444444444
-4444444444444444
-4444444444444444
-4444444444444444
-4444444444444444
-4444444444444444
-4444444444444444
-4444444444444444
-4444444444444444
-4444444444444444
-4444444444444444`],
-  [ c, bitmap`
+    [ b, bitmap`
+1111111111111111
+1111111111111111
+1111111111111111
+1111111111111111
+1111111111111111
+1111111111111111
+1111111111111111
+1111111111111111
+1111111111111111
+1111111111111111
+1111111111111111
+1111111111111111
+1111111111111111
+1111111111111111
+1111111111111111
+1111111111111111`],
+    [ c, bitmap`
+2222222222222222
+2222222222222222
+2222222222222222
+2222222222222222
+2222222222222222
+2222222222222222
+2222222222222222
+2222222222222222
+2222222222222222
+2222222222222222
+2222222222222222
+2222222222222222
+2222222222222222
+2222222222222222
+2222222222222222
+2222222222222222`],
+    [ d, bitmap`
 3333333333333333
 3333333333333333
 3333333333333333
@@ -103,7 +108,24 @@ setLegend(
 3333333333333333
 3333333333333333
 3333333333333333`],
-  [ d, bitmap`
+    [ e, bitmap`
+4444444444444444
+4444444444444444
+4444444444444444
+4444444444444444
+4444444444444444
+4444444444444444
+4444444444444444
+4444444444444444
+4444444444444444
+4444444444444444
+4444444444444444
+4444444444444444
+4444444444444444
+4444444444444444
+4444444444444444
+4444444444444444`],
+    [ f, bitmap`
 5555555555555555
 5555555555555555
 5555555555555555
@@ -120,7 +142,7 @@ setLegend(
 5555555555555555
 5555555555555555
 5555555555555555`],
-  [ e, bitmap`
+    [ g, bitmap`
 6666666666666666
 6666666666666666
 6666666666666666
@@ -137,7 +159,7 @@ setLegend(
 6666666666666666
 6666666666666666
 6666666666666666`],
-  [ f, bitmap`
+    [ h, bitmap`
 7777777777777777
 7777777777777777
 7777777777777777
@@ -154,7 +176,7 @@ setLegend(
 7777777777777777
 7777777777777777
 7777777777777777`],
-  [ g, bitmap`
+    [ i, bitmap`
 8888888888888888
 8888888888888888
 8888888888888888
@@ -170,8 +192,26 @@ setLegend(
 8888888888888888
 8888888888888888
 8888888888888888
-8888888888888888`]
+8888888888888888`],
+    [ j, bitmap`
+9999999999999999
+9999999999999999
+9999999999999999
+9999999999999999
+9999999999999999
+9999999999999999
+9999999999999999
+9999999999999999
+9999999999999999
+9999999999999999
+9999999999999999
+9999999999999999
+9999999999999999
+9999999999999999
+9999999999999999
+9999999999999999`]
 );
+
 
 class Complex {
     constructor(r, i) {
@@ -191,53 +231,67 @@ class Complex {
 
 function julia(x, y) {
     let c = juliaPos
-    let n = 0
+    let iterations = 0
     let z = new Complex(x, y)
-    while (z.abs() <= 2 && n < (Math.log2(max) * 32)) {
+    while (z.abs() <= 2 && iterations < (Math.log2(max) * 64)) {
         z = c.add(z.square())
-        n += 1
+        iterations += 1
     }
-    return [n, z.abs()]
+    return [iterations, z.abs()]
 }
 
-let juliaPos = new Complex(0.5, 0.5)
+let resolution = 64
+let max = resolution
+let xOffset = 0
+let yOffset = 0
+
+let maxIterations = 64
+
+let resFac = 1.25
+let moveFac = 0.2
+let zoomFac = 0.2
+let posFac = 0.01
+
+let mode = "zoom"
+
+let juliaPos = new Complex(0.3, 0.5)
 
 function render() {
     var screen = ``
 
-    for (let x = 0; x < res; x++) {
-    for (let y = 0; y < res; y++) {
-        n = julia(((y / max) * 2) - 1.35 - xoff, ((x / max) * 2) - 1 - yoff)
-        if (n[1] < 2) {
-            screen += "0"
-        } else if (n[0] > 64 * 0.6) {
-            screen += "2"
-        } else if (n[0] > 64 * 0.4) {
-            screen += "5"
-        } else if (n[0] > 64 * 0.3) {
-            screen += "3"
-        } else if (n[0] > 64 * 0.2) {
-            screen += "6"
-        } else if (n[0] > 64 * 0.1) {
-            screen += "4"
-        } else {
-            screen += "5"
+    for (let x = 0; x < resolution; x++) {
+        for (let y = 0; y < resolution; y++) {
+            iterations = julia(((y / max) * 2) - 1 - xOffset, ((x / max) * 2) - 1 - yOffset)
+            if (iterations[1] < 2) {
+                screen += "0"
+            } else if (iterations[0] > 64 * 0.6) {
+                screen += "3"
+            } else if (iterations[0] > 64 * 0.4) {
+                screen += "9"
+            } else if (iterations[0] > 64 * 0.3) {
+                screen += "6"
+            } else if (iterations[0] > 64 * 0.2) {
+                screen += "4"
+            } else if (iterations[0] > 64 * 0.1) {
+                screen += "7"
+            } else {
+                screen += "5"
+            }
+            
         }
-
-    }
-    screen += "\n"
-
+        screen += "\n"
     }
     setMap(screen);
+
     clearText()
     if (mode == "zoom") {
-        addText("Zoom: 2^" + Math.log2(1 / (res/max)), { 
+        addText("Zoom: 2^" + Math.log2(1 / (resolution/max)), { 
             x: 2, 
             y: 0, 
             color: color`0`
         })
     } else if (mode == "resolution") {
-        addText("Res: " + res, { 
+        addText("Res: " + Math.round(resolution * 1000) / 1000, { 
             x: 2, 
             y: 0, 
             color: color`0`
@@ -256,12 +310,13 @@ function render() {
         color: color`0`
     })
 }
+
 render()
 
 //move
 onInput("w", () => {
     if (mode != "julia pos") {
-        yoff += movefac * (res/max)
+        yOffset += moveFac * (resolution/max)
     } else {
         juliaPos.i += posFac
         juliaPos.i = Math.round(juliaPos.i * 100) / 100
@@ -271,7 +326,7 @@ onInput("w", () => {
 
 onInput("s", () => {
     if (mode != "julia pos") {
-        yoff -= movefac * (res/max)
+        yOffset -= moveFac * (resolution/max)
     } else {
         juliaPos.i -= posFac
         juliaPos.i = Math.round(juliaPos.i * 100) / 100
@@ -281,9 +336,9 @@ onInput("s", () => {
 
 onInput("a", () => {
     if (mode != "julia pos") {
-        xoff += movefac * (res/max)
+        xOffset += moveFac * (resolution/max)
     } else {
-        juliaPos.r += posFac
+        juliaPos.r -= posFac
         juliaPos.r = Math.round(juliaPos.r * 100) / 100
     }
     render()
@@ -291,9 +346,9 @@ onInput("a", () => {
 
 onInput("d", () => {
     if (mode != "julia pos") {
-        xoff -= movefac * (res/max)
+        xOffset -= moveFac * (resolution/max)
     } else {
-        juliaPos.r -= posFac
+        juliaPos.r += posFac
         juliaPos.r = Math.round(juliaPos.r * 100) / 100
     }
     render()
@@ -302,11 +357,11 @@ onInput("d", () => {
 onInput("i", () => { //zoom, increase detail, or change julia position
     if (mode == "zoom") {
         max *= 2
-        yoff -= 1 * (res/max)
-        xoff -= 1 * (res/max)
+        yOffset -= 1 * (resolution/max)
+        xOffset -= 1 * (resolution/max)
     } else if (mode == "resolution") {
-        res *= resfac
-        max *= resfac
+        resolution *= resFac
+        max *= resFac
     } else if (mode == "julia pos") {
         posFac += 0.01
         posFac = Math.min(0.1, posFac)
@@ -318,11 +373,11 @@ onInput("i", () => { //zoom, increase detail, or change julia position
 onInput("k", () => { //zoom, increase detail, or change julia position
     if (mode == "zoom") {
         max *= 0.5
-        yoff += 0.5 * (res/max)
-        xoff += 0.5 * (res/max)
+        yOffset += 0.5 * (resolution/max)
+        xOffset += 0.5 * (resolution/max)
     } else if (mode == "resolution") {
-        res /= resfac
-        max /= resfac
+        resolution /= resFac
+        max /= resFac
     } else if (mode == "julia pos") {
         posFac -= 0.01
         posFac = Math.max(0.01, posFac)
