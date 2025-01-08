@@ -1,7 +1,4 @@
 /*
-First time? Check out the tutorial game:
-https://sprig.hackclub.com/gallery/getting_started
-
 @title: Julia Set
 @author: Nathan
 @tags: ['sandbox','simulation']
