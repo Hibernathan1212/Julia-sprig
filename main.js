@@ -4,10 +4,29 @@ https://sprig.hackclub.com/gallery/getting_started
 
 @title: Julia Set
 @author: Nathan
-@tags: []
-@addedOn: 2024-00-00
+@tags: ['sandbox','simulation']
+@addedOn: 2025-01-08
 Instructions:
 Explore different Julia Sets
+
+Controls:
+    w - Move up
+    s - Move down
+    a - Move left
+    d - Move right
+
+    j, l - Change between modes: zoom, resolution, and julia position
+
+    Mode: Zoom
+    i - Zoom in
+    k - Zoom out
+
+    Mode: Resolution
+    i - Increase resolution (Worse performance)
+    k - Decrease resoltuion (Better performance)
+
+    Mode: Julia position
+    w,a,s,d - Move position
 */
 
 let n;
@@ -33,7 +52,7 @@ let zoomfac = 0.2
 
 let mode = "zoom"
 
-let posFac = 0.1
+let posFac = 0.05
 
 setLegend(
   [ a, bitmap`
@@ -174,18 +193,14 @@ class Complex {
 }
 
 function julia(x, y) {
-    // With just a few tweaks, this becomes a Julia Set viewer!
-    // let c = new Complex(x, y)
     let c = juliaPos
     let n = 0
-    // let z = new Complex(i, j)
     let z = new Complex(x, y)
     while (z.abs() <= 2 && n < (Math.log2(max) * 32)) {
         z = c.add(z.square())
         n += 1
     }
     return [n, z.abs()]
-
 }
 
 let juliaPos = new Complex(0.5, 0.5)
