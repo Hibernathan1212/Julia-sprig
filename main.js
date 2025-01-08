@@ -52,7 +52,7 @@ let zoomfac = 0.2
 
 let mode = "zoom"
 
-let posFac = 0.05
+let posFac = 0.01
 
 setLegend(
   [ a, bitmap`
@@ -246,7 +246,7 @@ function render() {
             color: color`0`
         })
     } else if (mode == "julia pos") {
-        addText("Pos: " + juliaPos.r + " + " + juliaPos.i + "i", { 
+        addText("Pos: " + juliaPos.r + "+" + juliaPos.i + "i", { 
             x: 2, 
             y: 0, 
             color: color`0`
@@ -281,6 +281,7 @@ onInput("s", () => {
     }
     render()
 })
+
 onInput("a", () => {
     if (mode != "julia pos") {
         xoff += movefac * (res/max)
@@ -310,7 +311,8 @@ onInput("i", () => { //zoom, increase detail, or change julia position
         res *= resfac
         max *= resfac
     } else if (mode == "julia pos") {
-
+        posFac += 0.01
+        posFac = Math.min(0.1, posFac)
     }
     
     render()
@@ -325,9 +327,11 @@ onInput("k", () => { //zoom, increase detail, or change julia position
         res /= resfac
         max /= resfac
     } else if (mode == "julia pos") {
-        
+        posFac -= 0.01
+        posFac = Math.max(0.01, posFac)
+
     }
-        
+
     render()
 })
 
